@@ -56,9 +56,15 @@ const updatePopulation = async (request, reply) => {
         (currentCity) =>
           capitalizeFirstLetter(currentCity.toLowerCase()) === city
       );
-      dbResponse[state][dbCity[0]] = parseInt(population);
-      dbService.updateDatalist(dbResponse);
-      return reply.status(200).send({ message: "Data update" });
+      if (dbResponse[state] && dbCity.length === 0) {
+        dbResponse[state][city] = parseInt(population);
+        await dbService.updateDatalist(dbResponse);
+        return reply.status(201).send({ message: "Data created" });
+      } else {
+        dbResponse[state][dbCity[0]] = parseInt(population);
+        dbService.updateDatalist(dbResponse);
+        return reply.status(200).send({ message: "Data update" });
+      }
     }
   } catch (error) {
     reply.status(500).send(error);
